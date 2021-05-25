@@ -6,27 +6,27 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static bool writeInterpretedBit(char *meaningfulBits, int *position, int *darkBits);
+static bool writeInterpretedBit(char *interpretedData, int *interpretedCount, int *darkBits);
 
 char *interpretLightData(const char *lightData, size_t sensorCount) {
-    char *interpreted = (char *) malloc(sensorCount / 2);
-    memAllocationCheck(interpreted, __func__);
+    char *interpretedData = (char *) malloc((sensorCount / 2) + 1);
+    memAllocationCheck(interpretedData, __func__);
 
-    int dark = 0, errors = 0, position = 0;
+    int dark = 0, interpretedCount = 0;
 
     for (int i = 0; i < sensorCount; i++) {
+        
         if (lightData[i] == '0') {
             dark++;
-        }
 
-        else if (lightData[i] == '1') {
-            bool end = writeInterpretedBit(interpreted, &position, &dark);
+        } else if (lightData[i] == '1') {
+            bool end = writeInterpretedBit(interpretedData, &interpretedCount, &dark);
             
             if (end) {
-                if (position > CODE_LEN) {
+                if (interpretedCount > CODE_LEN) {
                     break;
                 }
-                position = 0;
+                interpretedCount = 0;
             }
         }
 
@@ -35,27 +35,25 @@ char *interpretLightData(const char *lightData, size_t sensorCount) {
         }
     }
 
-    interpreted[position] = '\0';
+    interpretedData[interpretedCount] = '\0';
     
-    return interpreted;
+    return interpretedData;
 }
 
-static bool writeInterpretedBit(char *interpreted, int *position, int *darkBits) {
+static bool writeInterpretedBit(char *interpretedData, int *interpretedCount, int *darkBits) {
     if (*darkBits == 1) {
-        interpreted[*position] = '0';
+        interpretedData[*interpretedCount] = '0';
         *darkBits = 0;
-        (*position)++;
+        (*interpretedCount)++;
         return false;
-    }
-    
-    else if (*darkBits == 2) {
-        interpreted[*position] = '1';
+
+    } else if (*darkBits == 2) {
+        interpretedData[*interpretedCount] = '1';
         *darkBits = 0;
-        (*position)++;
+        (*interpretedCount)++;
         return false;
-    }
     
-    else {
+    } else {
         return true;
     }
 }

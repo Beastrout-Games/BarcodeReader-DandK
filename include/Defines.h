@@ -1,7 +1,8 @@
 #ifndef DEFINES_H_
 #define DEFINES_H_
 
-#define MARGIN 0.3
+#define LOWER_MARGIN 0.3
+#define UPPER_MARGIN 1.0 - LOWER_MARGIN
 
 #define ERROR_SYMBOL '#'
 

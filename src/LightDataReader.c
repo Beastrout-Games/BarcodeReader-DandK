@@ -16,7 +16,7 @@ char *readLightData(size_t *sensorCount) {
     memAllocationCheck(data, __func__);
 
     for (int i = 0; i < *sensorCount; i++) {
-        int scanReturn = scanf(" %f", data + i);
+        int scanReturn = scanf(" %f", &data[i]);
         inputCheck(scanReturn, 1, __func__);
     }
 
@@ -26,28 +26,24 @@ char *readLightData(size_t *sensorCount) {
     return binData;
 }
 
-char *binarizeLightData(size_t sensorCount, const float *data) {
-    #define isWithinUpper(x) (x) > 1.0 - (MARGIN)
-    #define isWithinLower(x) (x) < (MARGIN)
-    
+static char *binarizeLightData(size_t sensorCount, const float *data) {
     char *binData = (char *) malloc(sensorCount + 1);
     memAllocationCheck(binData, __func__);
 
     int uncertainDataCount = 0;
     for (int i = 0; i < sensorCount; i++) {
-        if (isWithinUpper(data[i])) {
+
+        if (data[i] > UPPER_MARGIN) {
             binData[i] = '1';
             resolveUncertain(uncertainDataCount, &binData[i-1], '0');
             uncertainDataCount = 0;
-        } 
-        
-        else if (isWithinLower(data[i])) {
+
+        } else if (data[i] < LOWER_MARGIN) {
             binData[i] = '0';
             resolveUncertain(uncertainDataCount, &binData[i-1], '1');
             uncertainDataCount = 0;
-        }
-        
-        else {
+
+        } else {
             uncertainDataCount++;
             binData[i] = ERROR_SYMBOL;
         }
@@ -60,9 +56,6 @@ char *binarizeLightData(size_t sensorCount, const float *data) {
     }
 
     return binData;
-
-    #undef isWithinUpper
-    #undef isWithinLower
 }
 
 static void resolveUncertain(int count, char *from, char value) {
