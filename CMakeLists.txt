@@ -10,12 +10,14 @@ add_executable(
     ${PROJECT_NAME}
         ${INC_DIR}/LightDataReader.h
         ${INC_DIR}/Interpreter.h
+        ${INC_DIR}/Decoder.h
         ${INC_DIR}/Validation.h
         ${INC_DIR}/ErrorChecks.h
         
         ${SRC_DIR}/main.c
         ${SRC_DIR}/LightDataReader.c
         ${SRC_DIR}/Interpreter.c
+        ${SRC_DIR}/Decoder.c
         ${SRC_DIR}/Validation.c
         ${SRC_DIR}/ErrorChecks.c
 )
