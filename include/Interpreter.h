@@ -1,7 +1,7 @@
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
 
-#include <stdlib.h>
+#include <stddef.h>
 
 char *interpretLightData(const char *lightData, size_t sensorCount);
 
