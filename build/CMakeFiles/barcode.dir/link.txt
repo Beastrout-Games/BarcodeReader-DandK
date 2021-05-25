@@ -1,1 +1,0 @@
-/bin/gcc-10 -g   CMakeFiles/barcode.dir/src/main.c.o CMakeFiles/barcode.dir/src/LightDataReader.c.o CMakeFiles/barcode.dir/src/Interpreter.c.o CMakeFiles/barcode.dir/src/Validation.c.o CMakeFiles/barcode.dir/src/ErrorChecks.c.o  -o barcode 
