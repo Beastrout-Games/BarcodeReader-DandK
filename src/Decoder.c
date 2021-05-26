@@ -15,10 +15,10 @@ static void decodeMeaningfulData(const char *binData, char *barcode);
 static char *getMeaningfulSection(char *binData);
 static void findStartStopSignals(char *binData, char **start, char **stop);
 static int checkBarcode(char **begin, char **end);
-static size_t getDecodableLen(const char *binaryData);
+static inline size_t getDecodableLen(const char *binaryData);
 
 char *decodeBinData(char *binaryData) {
-    char *barcode = (char *) malloc( (strlen(binaryData) / 5) + 1 );
+    char *barcode = (char *) calloc( (strlen(binaryData) / 5) + 1 , sizeof(char));
     memAllocationCheck(barcode, __func__);
     
     char *meaningfulData = getMeaningfulSection(binaryData);
@@ -45,11 +45,11 @@ static char *getMeaningfulSection(char *binData) {
         case FULL_BARCODE:
             return begin;
         case TRUNCATED_BARCODE:
-            printf("DEBUG: Barcode truncated.\n");
-            exit(1); /* TEMP */
+            printf("Barcode truncated. Please center the scanner.\n");
+            exit(EXIT_FAILURE);
         case NO_BARCODE:
-            printf("DEBUG: No barcode found.");
-            exit(1);
+            printf("No barcode found.");
+            exit(EXIT_FAILURE);
     }
 }
 
@@ -97,17 +97,15 @@ static void decodeMeaningfulData(const char *binData, char *barcode) {
         for (int c = 0; c < strlen(symbols); c++) {
             if (strncmp(&binData[i], codes[c], CODE_LEN) == 0) {
                 strappend(barcode, symbols[c]);
+                break;
             }
         }
     }
 }
 
-static size_t getDecodableLen(const char *binaryData) {
+static inline size_t getDecodableLen(const char *binaryData) {
     size_t len = strlen(binaryData);
-    
-    if (len % CODE_LEN) {
-        len--;
-    }
+    len -= len % CODE_LEN;
 
     return len;
 }

@@ -23,7 +23,7 @@ add_executable(
         ${SRC_DIR}/Validation.c
         ${SRC_DIR}/ErrorChecks.c
         ${SRC_DIR}/StringUtil.c
-        )
+)
 
 target_include_directories(
     ${PROJECT_NAME} 
