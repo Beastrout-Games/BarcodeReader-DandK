@@ -22,6 +22,9 @@ char *decodeBinData(char *binaryData) {
     memAllocationCheck(barcode, __func__);
     
     char *meaningfulData = getMeaningfulSection(binaryData);
+    if (meaningfulData == NULL) {
+        return NULL;
+    }
 
     decodeMeaningfulData(meaningfulData, barcode);
     
@@ -44,12 +47,14 @@ static char *getMeaningfulSection(char *binData) {
     switch (checkBarcode(&begin, &end)) {
         case FULL_BARCODE:
             return begin;
+
         case TRUNCATED_BARCODE:
             printf("Barcode truncated. Please center the scanner.\n");
-            exit(EXIT_FAILURE);
+            return NULL;
+            
         case NO_BARCODE:
             printf("No barcode found.");
-            exit(EXIT_FAILURE);
+            return NULL;
     }
 }
 

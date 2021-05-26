@@ -16,6 +16,10 @@ int main(void) {
     char *decoded = decodeBinData(binaryData);
     free(binaryData);
 
+    if (decoded == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
     if (validate(decoded)) {
         printf("%s\n", decoded);
     } else {
