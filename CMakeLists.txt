@@ -13,6 +13,8 @@ add_executable(
         ${INC_DIR}/Decoder.h
         ${INC_DIR}/Validation.h
         ${INC_DIR}/ErrorChecks.h
+        ${INC_DIR}/StringUtil.h
+        
         
         ${SRC_DIR}/main.c
         ${SRC_DIR}/LightDataReader.c
@@ -20,7 +22,8 @@ add_executable(
         ${SRC_DIR}/Decoder.c
         ${SRC_DIR}/Validation.c
         ${SRC_DIR}/ErrorChecks.c
-)
+        ${SRC_DIR}/StringUtil.c
+        )
 
 target_include_directories(
     ${PROJECT_NAME} 

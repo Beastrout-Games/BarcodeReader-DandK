@@ -5,6 +5,7 @@
 #define UPPER_MARGIN 1.0 - LOWER_MARGIN
 
 #define ERROR_SYMBOL '#'
+#define SYMBOL_STRING "0123456789-"
 
 #define CODE_LEN 5
 

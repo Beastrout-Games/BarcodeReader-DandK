@@ -1,25 +1,113 @@
 #include "Decoder.h"
 #include "Defines.h"
 #include "ErrorChecks.h"
+#include "StringUtil.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-char *barcodeFromBinData(const char *binaryData) {
+#define FULL_BARCODE 2
+#define TRUNCATED_BARCODE 1
+#define NO_BARCODE 0
+
+static void decodeMeaningfulData(const char *binData, char *barcode);
+static char *getMeaningfulSection(char *binData);
+static void findStartStopSignals(char *binData, char **start, char **stop);
+static int checkBarcode(char **begin, char **end);
+static size_t getDecodableLen(const char *binaryData);
+
+char *decodeBinData(char *binaryData) {
     char *barcode = (char *) malloc( (strlen(binaryData) / 5) + 1 );
     memAllocationCheck(barcode, __func__);
+    
+    char *meaningfulData = getMeaningfulSection(binaryData);
 
-    char *codes[] = {
-        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, START_STOP
-    };
+    decodeMeaningfulData(meaningfulData, barcode);
+    
+    return barcode;
+}
 
-    int startsFound = 0;
+static char *getMeaningfulSection(char *binData) {
+    char *begin, *end;
+    
+    findStartStopSignals(binData, &begin, &end);
+
+    if (checkBarcode(&begin, &end) == FULL_BARCODE) {
+        return begin;
+    }
+
+    strrev(binData);
+
+    findStartStopSignals(binData, &begin, &end);
+
+    switch (checkBarcode(&begin, &end)) {
+        case FULL_BARCODE:
+            return begin;
+        case TRUNCATED_BARCODE:
+            printf("DEBUG: Barcode truncated.\n");
+            exit(1); /* TEMP */
+        case NO_BARCODE:
+            printf("DEBUG: No barcode found.");
+            exit(1);
+    }
+}
+
+static int checkBarcode(char **begin, char **end) {
+    if (*begin && *end) {
+        *begin += CODE_LEN;
+        **end = '\0';
+        return FULL_BARCODE;
+
+    } else if (*begin) {
+        return TRUNCATED_BARCODE;
+    }
+
+    return NO_BARCODE;
+}
+
+static void findStartStopSignals(char *binData, char **start, char **stop) {    
+    size_t len = getDecodableLen(binData);
+    
+    *start = *stop = NULL;
+
     int step = 1;
-    for (int i = 0; i < strlen(binaryData); i += step) {
-        if (strncmp(START_STOP, &binaryData[i], CODE_LEN) == 0) {
-            startsFound++;
-            step = CODE_LEN;
+    for (int i = 0; i < len; i += step) {
+        if (strncmp(START_STOP, &binData[i], CODE_LEN) == 0) {
+            if (*start == NULL) {
+                *start = &binData[i];
+                step = CODE_LEN;
+            } else {
+                *stop = &binData[i];
+                return;
+            }
         }
     }
+}
+
+static void decodeMeaningfulData(const char *binData, char *barcode) {
+    const char *codes[] = {
+        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN };
     
+    const char *symbols = SYMBOL_STRING;
+
+    size_t len = getDecodableLen(binData);
+
+    for (int i = 0; i < len; i += CODE_LEN) {
+        for (int c = 0; c < strlen(symbols); c++) {
+            if (strncmp(&binData[i], codes[c], CODE_LEN) == 0) {
+                strappend(barcode, symbols[c]);
+            }
+        }
+    }
+}
+
+static size_t getDecodableLen(const char *binaryData) {
+    size_t len = strlen(binaryData);
+    
+    if (len % CODE_LEN) {
+        len--;
+    }
+
+    return len;
 }
